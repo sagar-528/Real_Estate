@@ -1,5 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import Loader from "@/components/Loader";
 import Header from "@/components/Header";
 import HeroBanner from "@/components/HeroBanner";
@@ -10,6 +14,8 @@ import InvestmentApproach from "@/components/InvestmentApproach";
 import TeamSection from "@/components/TeamSection";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
+
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
@@ -22,21 +28,35 @@ export default function Home() {
         }
     }, [loading]);
 
+    useGSAP(() => {
+        if (!loading && !ScrollSmoother.get()) {
+            ScrollSmoother.create({
+                wrapper: "#smooth-wrapper",
+                content: "#smooth-content",
+                smooth: 1.5,
+                effects: true,
+            });
+            ScrollTrigger.refresh();
+        }
+    }, [loading]);
+
     return (
         <>
             {loading && <Loader onComplete={() => setLoading(false)} />}
-            <div id="wrapper" style={{ opacity: loading ? 0 : 1, transition: "opacity 0.5s" }}>
-                <Header />
-                <main className="main-wrap">
-                    <HeroBanner />
-                    <AboutSection />
-                    <StatsSection />
-                    <InfoSection />
-                    <InvestmentApproach />
-                    <TeamSection />
-                    <ContactForm />
-                </main>
-                <Footer />
+            <Header />
+            <div id="smooth-wrapper" style={{ opacity: loading ? 0 : 1, transition: "opacity 0.5s" }}>
+                <div id="smooth-content">
+                    <main className="main-wrap">
+                        <HeroBanner />
+                        <AboutSection />
+                        <StatsSection />
+                        <InfoSection />
+                        <InvestmentApproach />
+                        <TeamSection />
+                        <ContactForm />
+                    </main>
+                    <Footer />
+                </div>
             </div>
         </>
     );

@@ -1,4 +1,10 @@
 "use client";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
+
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const footerNav = [
     { label: "Home", href: "#home" },
@@ -11,14 +17,35 @@ const footerNav = [
 export default function Footer() {
     const year = new Date().getFullYear();
 
+    useGSAP(() => {
+        document.fonts.ready.then(() => {
+            // ── FooterSection-style: SplitText chars flying up on scroll scrub ──
+            const footTextSplit = SplitText.create(".footer-logo-animate", { type: "chars" });
+
+            gsap.from(footTextSplit.chars, {
+                yPercent: 200,
+                stagger: 0.05,
+                ease: "power1.inOut",
+                scrollTrigger: {
+                    trigger: ".footer",
+                    start: "top 80%",
+                    end: "top 30%",
+                    scrub: 1.5,
+                },
+            });
+        });
+    }, []);
+
     return (
         <footer className="footer">
             <div className="holder">
                 <div className="footer-top">
                     <div>
-                        <a href="#home" className="footer-logo-name">
-                            Prime<span>vest</span>
-                        </a>
+                        <div style={{ overflow: "hidden", marginBottom: 16 }}>
+                            <a href="#home" className="footer-logo-name footer-logo-animate" style={{ display: "inline-block", margin: 0 }}>
+                                Prime<span style={{ color: "var(--accent)" }}>vest</span>
+                            </a>
+                        </div>
                         <ul className="footer-nav">
                             {footerNav.map((item) => (
                                 <li key={item.label}>

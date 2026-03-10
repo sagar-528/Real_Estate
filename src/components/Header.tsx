@@ -1,16 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-
-const navLeft = [
-    { label: "Home", href: "#home" },
-    { label: "About", href: "#about" },
-    { label: "Invest", href: "#invest" },
-];
-
-const navRight = [
-    { label: "Team", href: "#team" },
-    { label: "Contact", href: "#contact" },
-];
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
@@ -21,6 +12,63 @@ export default function Header() {
         window.addEventListener("scroll", onScroll);
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
+
+    // ── SpyltMilk Navbar-style magnetic hover effect ──
+    useGSAP(() => {
+        const els = Array.from(
+            document.querySelectorAll<HTMLElement>(".header-logo, .header-nav-list a, .header-phone")
+        );
+        if (!els.length) return;
+
+        const disposers: Array<() => void> = [];
+
+        els.forEach((el) => {
+            const onMove = (e: MouseEvent) => {
+                const b = el.getBoundingClientRect();
+                const x = e.clientX - b.left;
+                const y = e.clientY - b.top;
+                const offsetX = (x / b.width - 0.5) * 10;
+                const offsetY = (y / b.height - 0.5) * 10;
+                gsap.to(el, {
+                    x: offsetX,
+                    y: offsetY,
+                    scale: 1.1,
+                    duration: 0.25,
+                    ease: "power2.out",
+                });
+            };
+
+            const onLeave = () =>
+                gsap.to(el, {
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.35,
+                    ease: "power3.out",
+                });
+
+            el.addEventListener("mousemove", onMove);
+            el.addEventListener("mouseleave", onLeave);
+
+            disposers.push(() => {
+                el.removeEventListener("mousemove", onMove);
+                el.removeEventListener("mouseleave", onLeave);
+            });
+        });
+
+        return () => disposers.forEach((d) => d());
+    });
+
+    const navLeft = [
+        { label: "Home", href: "#home" },
+        { label: "About", href: "#about" },
+        { label: "Invest", href: "#invest" },
+    ];
+
+    const navRight = [
+        { label: "Team", href: "#team" },
+        { label: "Contact", href: "#contact" },
+    ];
 
     return (
         <header className={`header ${scrolled ? "scrolled" : ""}`}>

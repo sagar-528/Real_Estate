@@ -275,6 +275,36 @@ button {
   display: block;
 }
 
+.loader-progress-wrap {
+  margin-top: 40px;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.loader-progress-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.loader-progress-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loader-progress-fill {
+  height: 100%;
+  background: var(--text-primary);
+  transition: width 0.1s linear;
+}
+
 /* ── Header ────────────────────────────────────────────── */
 .header {
   position: fixed;
@@ -490,6 +520,21 @@ button {
 .slider-dot.active {
   background: var(--accent);
   width: 48px;
+}
+
+/* ── ScrollSmoother wrapper ────────────────────────────── */
+#smooth-wrapper {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+#smooth-content {
+  overflow: visible;
+  width: 100%;
 }
 
 /* ── Main Wrap ─────────────────────────────────────────── */
@@ -924,6 +969,46 @@ button {
 
 .img-float {
   will-change: transform;
+}
+
+/* ── SplitText / GSAP initial animation states ─────────── */
+.about-heading-primary,
+.info-heading-animate {
+  color: #787068;
+}
+
+.about-heading-secondary {
+  color: #504840;
+}
+
+.about-reveal-box,
+.stats-highlight-scroll,
+.invest-highlight-scroll,
+.contact-rolling-animation,
+.banner-subtitle-scroll {
+  clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+}
+
+.stats-highlight-bar,
+.invest-highlight-bar {
+  background: var(--accent);
+  margin-top: -8px;
+  padding: 8px 16px;
+  display: inline-block;
+  color: var(--bg-primary);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  font-size: var(--sub);
+  text-transform: uppercase;
+}
+
+.about-paragraph-line,
+.info-paragraph-line {
+  overflow: hidden;
+}
+
+.slogan-text {
+  color: #504840;
 }
 
 /* ── Responsive ─────────────────────────────────────────── */
