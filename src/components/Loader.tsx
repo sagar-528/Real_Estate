@@ -7,9 +7,8 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     const [progress, setProgress] = useState(0);
     const [canHide, setCanHide] = useState(false);
 
-    // ── SpyltMilk PreLoader-style resource tracking ──
     useEffect(() => {
-        const MIN_DURATION = 1200;
+        const MIN_DURATION = 1400;
         const startTime = performance.now();
 
         const resources: (HTMLImageElement | HTMLVideoElement)[] = [
@@ -79,14 +78,65 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
         };
     }, []);
 
-    // ── SpyltMilk PreLoader-style GSAP fade-out ──
+    // Entrance animations for loader content
+    useGSAP(() => {
+        const tl = gsap.timeline();
+
+        // Staggered text lines slide up
+        tl.fromTo(
+            ".loader-line-text",
+            { y: 40, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out" }
+        );
+
+        // Logo icon scales in with bounce
+        tl.fromTo(
+            ".loader-key-icon",
+            { scale: 0, rotation: -180 },
+            { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.7)" },
+            "-=0.4"
+        );
+
+        // Logo text chars stagger in
+        tl.fromTo(
+            ".loader-logo-text",
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+            "-=0.3"
+        );
+
+        // Progress bar fades in
+        tl.fromTo(
+            ".loader-progress-wrap",
+            { y: 15, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
+            "-=0.2"
+        );
+    }, []);
+
+    // Exit animation
     useGSAP(() => {
         if (progress >= 100 && canHide) {
-            gsap.to(".loader", {
+            const tl = gsap.timeline({ onComplete });
+
+            // Scale and fade the content
+            tl.to(".loader-box", {
+                scale: 0.9,
+                opacity: 0,
+                duration: 0.4,
+                ease: "power2.in",
+            });
+
+            // Split the background into two panels sliding apart
+            tl.to(".loader-bg", {
                 yPercent: -100,
-                duration: 0.9,
+                duration: 0.8,
                 ease: "power3.inOut",
-                onComplete,
+            }, "-=0.1");
+
+            tl.to(".loader", {
+                yPercent: -100,
+                duration: 0.01,
             });
         }
     }, [progress, canHide, onComplete]);
@@ -111,7 +161,6 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
                     <div className="loader-key-icon" />
                     <span className="loader-logo-text">Primevest</span>
                 </div>
-                {/* SpyltMilk-style progress bar */}
                 <div className="loader-progress-wrap">
                     <p className="loader-progress-text">{progress}%</p>
                     <div className="loader-progress-bar">

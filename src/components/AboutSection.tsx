@@ -1,59 +1,90 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 export default function AboutSection() {
     const sectionRef = useRef<HTMLDivElement>(null);
-    const col1Ref = useRef<HTMLDivElement>(null);
     const imgRef = useRef<HTMLDivElement>(null);
-    const col3Ref = useRef<HTMLDivElement>(null);
-    const sloganRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Reveal text columns
-            gsap.fromTo(
-                col1Ref.current,
-                { x: -40, opacity: 0 },
-                {
-                    x: 0, opacity: 1, duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: col1Ref.current, start: "top 80%" },
-                }
-            );
-            gsap.fromTo(
-                col3Ref.current,
-                { x: 40, opacity: 0 },
-                {
-                    x: 0, opacity: 1, duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: col3Ref.current, start: "top 80%" },
-                }
-            );
+    useGSAP(() => {
+        document.fonts.ready.then(() => {
+            const ctx = gsap.context(() => {
+                // SplitText on the heading — scrub color reveal word by word
+                const headingSplit = SplitText.create(".about-heading-primary", { type: "words" });
+                gsap.to(headingSplit.words, {
+                    color: "var(--text-primary)",
+                    ease: "power1.in",
+                    stagger: 1,
+                    scrollTrigger: {
+                        trigger: ".about-heading-primary",
+                        start: "top 80%",
+                        end: "bottom 60%",
+                        scrub: true,
+                    },
+                });
 
-            // Parallax on the centre image
-            gsap.to(imgRef.current, {
-                y: -40, ease: "none",
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: "top bottom", end: "bottom top",
-                    scrub: 1.5,
-                },
-            });
+                // Clip-path reveal on the subheading box
+                gsap.to(".about-reveal-box", {
+                    duration: 0.5,
+                    clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+                    ease: "circ.inOut",
+                    scrollTrigger: {
+                        trigger: ".about-reveal-box",
+                        start: "top 75%",
+                    },
+                });
 
-            // Slogan reveal
-            gsap.fromTo(
-                sloganRef.current,
-                { y: 40, opacity: 0 },
-                {
-                    y: 0, opacity: 1, duration: 1.2, ease: "power3.out",
-                    scrollTrigger: { trigger: sloganRef.current, start: "top 85%" },
-                }
-            );
-        }, sectionRef);
+                // SplitText on paragraphs — words slide up with rotation
+                const paragraphSplit = SplitText.create(".about-team-text", {
+                    type: "words,lines",
+                    linesClass: "about-paragraph-line",
+                });
+                gsap.from(paragraphSplit.words, {
+                    duration: 1,
+                    stagger: 0.01,
+                    yPercent: 300,
+                    rotate: 3,
+                    ease: "power1.inOut",
+                    scrollTrigger: {
+                        trigger: ".about-team",
+                        start: "top 60%",
+                    },
+                });
 
-        return () => ctx.revert();
+                // Parallax on the centre image
+                gsap.to(imgRef.current, {
+                    y: -40,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1.5,
+                    },
+                });
+
+                // SplitText on the slogan — scrub color reveal word by word
+                const sloganSplit = SplitText.create(".slogan-text", { type: "words" });
+                gsap.to(sloganSplit.words, {
+                    color: "var(--text-secondary)",
+                    ease: "power1.in",
+                    stagger: 1,
+                    scrollTrigger: {
+                        trigger: ".slogan",
+                        start: "top 80%",
+                        end: "bottom 60%",
+                        scrub: true,
+                    },
+                });
+            }, sectionRef);
+
+            return () => ctx.revert();
+        });
     }, []);
 
     return (
@@ -64,16 +95,14 @@ export default function AboutSection() {
                 <div className="about-team">
 
                     {/* Col 1 — heading + intro text */}
-                    <div className="about-team-col reveal" ref={col1Ref}>
+                    <div className="about-team-col">
                         <div className="key-wrap"><div className="key" /></div>
-                        <h2>
-                            <div className="text-wrap">
-                                <div className="text-inner">About<br />Primevest</div>
-                            </div>
+                        <h2 className="about-heading-primary">
+                            About Primevest
                         </h2>
-                        <div className="subheading">
-                            <div className="text-wrap">
-                                <div className="text-inner">Multi-Family Real Estate Investments with Proven Returns</div>
+                        <div className="about-reveal-box">
+                            <div className="subheading">
+                                Multi-Family Real Estate Investments with Proven Returns
                             </div>
                         </div>
                         <p className="about-team-text mob-hidden">
@@ -92,14 +121,8 @@ export default function AboutSection() {
                     </div>
 
                     {/* Col 3 — body copy + Learn More */}
-                    <div className="about-team-col" ref={col3Ref}>
+                    <div className="about-team-col">
                         <p className="about-team-text">
-                            <span className="mob-hide">
-                                Primevest is a low leverage Private Equity Fund created to
-                                facilitate the acquisition of investment real estate with a
-                                particular emphasis on purchasing value-added multi-family
-                                properties.&nbsp;
-                            </span>
                             Founded by experienced principals with decades of real estate
                             expertise, Primevest marks our fourth Private Equity Fund. Our
                             seasoned team has a consistent record of delivering Monthly Cash Flow
@@ -113,11 +136,11 @@ export default function AboutSection() {
                 </div>
 
                 {/* ── Slogan ── */}
-                <div className="slogan" ref={sloganRef}>
+                <div className="slogan">
                     <p className="slogan-text">
                         &ldquo;Primevest&apos;s business model is simple: Get into the real
-                        estate market near its <strong>low point</strong> and get out before an{" "}
-                        <strong>economic downturn</strong>.&rdquo;
+                        estate market near its ow point and get out before an{" "}
+                        conomic downturn.&rdquo;
                     </p>
                 </div>
             </div>

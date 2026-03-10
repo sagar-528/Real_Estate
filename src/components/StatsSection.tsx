@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -12,21 +13,23 @@ const stats = [
     { number: 14, suffix: " Yrs", label: "Industry Experience", prefix: "" },
 ];
 
-function StatItem({ stat, index }: { stat: typeof stats[0]; index: number }) {
+function StatItem({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
     const numRef = useRef<HTMLSpanElement>(null);
     const wrapRef = useRef<HTMLDivElement>(null);
+    const labelRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    useGSAP(() => {
         const ctx = gsap.context(() => {
-            // Reveal card
+            // Card entrance with scale
             gsap.fromTo(
                 wrapRef.current,
-                { y: 40, opacity: 0 },
+                { y: 50, opacity: 0, scale: 0.9 },
                 {
                     y: 0,
                     opacity: 1,
-                    duration: 0.8,
-                    delay: index * 0.12,
+                    scale: 1,
+                    duration: 0.9,
+                    delay: index * 0.15,
                     ease: "power3.out",
                     scrollTrigger: {
                         trigger: wrapRef.current,
@@ -35,13 +38,13 @@ function StatItem({ stat, index }: { stat: typeof stats[0]; index: number }) {
                 }
             );
 
-            // Count-up animation
+            // Count-up with elastic finish
             const obj = { val: 0 };
             gsap.to(obj, {
                 val: stat.number,
-                duration: 2,
+                duration: 2.5,
                 ease: "power2.out",
-                delay: index * 0.12 + 0.3,
+                delay: index * 0.15 + 0.3,
                 scrollTrigger: {
                     trigger: wrapRef.current,
                     start: "top 85%",
@@ -55,7 +58,34 @@ function StatItem({ stat, index }: { stat: typeof stats[0]; index: number }) {
                         numRef.current.textContent = `${stat.prefix}${display}${stat.suffix}`;
                     }
                 },
+                onComplete: () => {
+                    // Pulse scale on complete
+                    if (numRef.current) {
+                        gsap.fromTo(
+                            numRef.current,
+                            { scale: 1 },
+                            { scale: 1.08, duration: 0.3, yoyo: true, repeat: 1, ease: "power2.inOut" }
+                        );
+                    }
+                },
             });
+
+            // Label slides up
+            gsap.fromTo(
+                labelRef.current,
+                { y: 15, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.6,
+                    delay: index * 0.15 + 0.6,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: wrapRef.current,
+                        start: "top 85%",
+                    },
+                }
+            );
         });
 
         return () => ctx.revert();
@@ -64,9 +94,13 @@ function StatItem({ stat, index }: { stat: typeof stats[0]; index: number }) {
     return (
         <div className="stat-item" ref={wrapRef}>
             <div className="stat-number">
-                <span ref={numRef}>{stat.prefix}0{stat.suffix}</span>
+                <span ref={numRef} className="shimmer-text">
+                    {stat.prefix}0{stat.suffix}
+                </span>
             </div>
-            <div className="stat-label">{stat.label}</div>
+            <div className="stat-label" ref={labelRef}>
+                {stat.label}
+            </div>
         </div>
     );
 }
@@ -74,9 +108,30 @@ function StatItem({ stat, index }: { stat: typeof stats[0]; index: number }) {
 export default function StatsSection() {
     const sectionRef = useRef<HTMLDivElement>(null);
 
+    useGSAP(() => {
+        gsap.fromTo(
+            ".stats-glow-line",
+            { scaleX: 0, opacity: 0 },
+            {
+                scaleX: 1,
+                opacity: 1,
+                duration: 1.4,
+                ease: "power2.inOut",
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top 85%",
+                },
+            }
+        );
+    }, []);
+
     return (
         <section className="stats-section" ref={sectionRef}>
             <div className="holder">
+                <div
+                    className="glow-line stats-glow-line"
+                    style={{ marginBottom: 24 }}
+                />
                 <div className="stats-grid">
                     {stats.map((stat, i) => (
                         <StatItem key={i} stat={stat} index={i} />

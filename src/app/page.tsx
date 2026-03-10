@@ -8,12 +8,14 @@ import Loader from "@/components/Loader";
 import Header from "@/components/Header";
 import HeroBanner from "@/components/HeroBanner";
 import AboutSection from "@/components/AboutSection";
+import Marquee from "@/components/Marquee";
 import StatsSection from "@/components/StatsSection";
 import InfoSection from "@/components/InfoSection";
 import InvestmentApproach from "@/components/InvestmentApproach";
 import TeamSection from "@/components/TeamSection";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
+import CustomCursor from "@/components/CustomCursor";
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -43,12 +45,14 @@ export default function Home() {
     return (
         <>
             {loading && <Loader onComplete={() => setLoading(false)} />}
+            <CustomCursor />
             <Header />
             <div id="smooth-wrapper" style={{ opacity: loading ? 0 : 1, transition: "opacity 0.5s" }}>
                 <div id="smooth-content">
                     <main className="main-wrap">
                         <HeroBanner />
                         <AboutSection />
+                        <Marquee />
                         <StatsSection />
                         <InfoSection />
                         <InvestmentApproach />

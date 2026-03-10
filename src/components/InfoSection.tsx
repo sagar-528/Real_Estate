@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 export default function InfoSection() {
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -13,56 +15,185 @@ export default function InfoSection() {
     const infoImgRef = useRef<HTMLDivElement>(null);
     const investImgRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Parallax on the info background image
-            gsap.to(bgImgRef.current, {
-                yPercent: 15, ease: "none",
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: "top bottom", end: "bottom top",
-                    scrub: 1.5,
-                },
-            });
+    useGSAP(() => {
+        document.fonts.ready.then(() => {
+            const ctx = gsap.context(() => {
+                // Parallax on the info background image
+                gsap.to(bgImgRef.current, {
+                    yPercent: 15,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1.5,
+                    },
+                });
 
-            // Parallax on side images
-            gsap.to(infoImgRef.current, {
-                y: -30, ease: "none",
-                scrollTrigger: {
-                    trigger: ".info-content",
-                    start: "top bottom", end: "bottom top",
-                    scrub: 1,
-                },
-            });
-            gsap.to(investImgRef.current, {
-                y: -30, ease: "none",
-                scrollTrigger: {
-                    trigger: ".invest-info",
-                    start: "top bottom", end: "bottom top",
-                    scrub: 1,
-                },
-            });
+                // Parallax on side images
+                gsap.to(infoImgRef.current, {
+                    y: -30,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: ".info-content",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1,
+                    },
+                });
+                gsap.to(investImgRef.current, {
+                    y: -30,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: ".invest-info",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1,
+                    },
+                });
 
-            // Reveal headings
-            gsap.fromTo(
-                topRef.current,
-                { y: 40, opacity: 0 },
-                {
-                    y: 0, opacity: 1, duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: topRef.current, start: "top 80%" },
+                // SplitText heading reveal
+                if (topRef.current) {
+                    const textInners = topRef.current.querySelectorAll(".text-inner");
+                    const split = SplitText.create(textInners, { type: "chars" });
+                    gsap.fromTo(
+                        split.chars,
+                        { y: 50, opacity: 0 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            duration: 0.8,
+                            stagger: 0.02,
+                            ease: "power3.out",
+                            scrollTrigger: { trigger: topRef.current, start: "top 80%" },
+                        }
+                    );
                 }
-            );
-            gsap.fromTo(
-                investTopRef.current,
-                { y: 40, opacity: 0 },
-                {
-                    y: 0, opacity: 1, duration: 1, ease: "power3.out",
-                    scrollTrigger: { trigger: investTopRef.current, start: "top 80%" },
-                }
-            );
-        }, sectionRef);
 
-        return () => ctx.revert();
+                // Subheading clip-path
+                gsap.fromTo(
+                    ".info-top .subheading",
+                    { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" },
+                    {
+                        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+                        duration: 0.8,
+                        ease: "power3.inOut",
+                        scrollTrigger: { trigger: ".info-top .subheading", start: "top 80%" },
+                    }
+                );
+
+                // Invest heading reveal
+                if (investTopRef.current) {
+                    const investTextInners = investTopRef.current.querySelectorAll(".text-inner");
+                    const investSplit = SplitText.create(investTextInners, { type: "chars" });
+                    gsap.fromTo(
+                        investSplit.chars,
+                        { y: 50, opacity: 0 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            duration: 0.8,
+                            stagger: 0.02,
+                            ease: "power3.out",
+                            scrollTrigger: { trigger: investTopRef.current, start: "top 80%" },
+                        }
+                    );
+                }
+
+                // Invest subheading clip-path
+                gsap.fromTo(
+                    ".invest-info-top .subheading",
+                    { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" },
+                    {
+                        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+                        duration: 0.8,
+                        ease: "power3.inOut",
+                        scrollTrigger: { trigger: ".invest-info-top .subheading", start: "top 80%" },
+                    }
+                );
+
+                // Info text paragraphs word reveal
+                const paraEls = sectionRef.current?.querySelectorAll(".info-text, .invest-info-text");
+                if (paraEls?.length) {
+                    const paraSplit = SplitText.create(paraEls, {
+                        type: "words,lines",
+                        linesClass: "info-paragraph-line",
+                    });
+                    gsap.from(paraSplit.words, {
+                        yPercent: 200,
+                        stagger: 0.01,
+                        duration: 0.8,
+                        ease: "power1.inOut",
+                        scrollTrigger: {
+                            trigger: ".info-content",
+                            start: "top 65%",
+                        },
+                    });
+                }
+
+                // Horizontal line reveal
+                gsap.fromTo(
+                    ".line-reveal .line-dash",
+                    { scaleX: 0 },
+                    {
+                        scaleX: 1,
+                        duration: 1.2,
+                        ease: "power2.inOut",
+                        scrollTrigger: {
+                            trigger: ".line-reveal",
+                            start: "top 80%",
+                        },
+                    }
+                );
+
+                // Link flash entrances
+                gsap.fromTo(
+                    ".info-block .link-flash",
+                    { x: -20, opacity: 0 },
+                    {
+                        x: 0,
+                        opacity: 1,
+                        duration: 0.6,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: ".info-block .link-flash",
+                            start: "top 85%",
+                        },
+                    }
+                );
+
+                // Image clip-path reveals
+                gsap.fromTo(
+                    ".info-img",
+                    { clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+                    {
+                        clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
+                        duration: 1.2,
+                        ease: "power3.inOut",
+                        scrollTrigger: {
+                            trigger: ".info-img",
+                            start: "top 80%",
+                        },
+                    }
+                );
+
+                gsap.fromTo(
+                    ".invest-info-img",
+                    { clipPath: "polygon(0 0%, 0 0%, 0 100%, 0 100%)" },
+                    {
+                        clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
+                        duration: 1.2,
+                        ease: "power3.inOut",
+                        scrollTrigger: {
+                            trigger: ".invest-info-img",
+                            start: "top 80%",
+                        },
+                    }
+                );
+            }, sectionRef);
+
+            return () => ctx.revert();
+        });
     }, []);
 
     return (
@@ -70,7 +201,6 @@ export default function InfoSection() {
             <div className="holder">
                 <div className="info">
 
-                    {/* ── Full background image (parallax) ── */}
                     <div className="info-bg img-float" ref={bgImgRef}>
                         <img
                             src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=80"
@@ -78,7 +208,6 @@ export default function InfoSection() {
                         />
                     </div>
 
-                    {/* ── Top heading block ── */}
                     <div className="info-top reveal" ref={topRef}>
                         <h2>
                             <div className="text-wrap">
@@ -92,7 +221,6 @@ export default function InfoSection() {
                         </div>
                     </div>
 
-                    {/* ── Info content grid ── */}
                     <div className="info-content">
                         <div className="line-wrap line-reveal">
                             <div className="line-dash" />
@@ -111,7 +239,6 @@ export default function InfoSection() {
                             </a>
                         </div>
 
-                        {/* Right side image */}
                         <div className="info-img img-float" ref={infoImgRef}>
                             <img
                                 src="https://images.unsplash.com/photo-1560448075-bb485b1b4cad?auto=format&fit=crop&w=700&q=80"
@@ -119,7 +246,6 @@ export default function InfoSection() {
                             />
                         </div>
 
-                        {/* ── Nested: Investment Approach ── */}
                         <div className="invest-info">
                             <div className="invest-info-top reveal" ref={investTopRef}>
                                 <h2>

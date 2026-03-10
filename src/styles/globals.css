@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root {
-  /* ── TREF color palette ── */
-  --c1: #F2F1ED;
-  --c2: #DCCBB3;
-  --c3: #141414;
-  --c4: #152621;
-  --c5: #F3EAE1;
-  --g1: linear-gradient(180deg, #152621 0%, #000 99.48%);
-  --g2: linear-gradient(180deg, #152621 18.75%, #000 99.48%);
+  /* ── Premium palette — deep navy + champagne gold ── */
+  --c1: #E8E1D5;
+  --c2: #C8A750;
+  --c3: #070B12;
+  --c4: #0C1420;
+  --c5: #EDE7DA;
+  --g1: linear-gradient(180deg, #0C1420 0%, #030508 99.48%);
+  --g2: linear-gradient(180deg, #0C1420 18.75%, #030508 99.48%);
 
   /* ── Fluid typography ── */
   --h1: max(40px, 7vw);
@@ -19,17 +19,18 @@
   --body: max(14px, 1vw);
   --sub: max(13px, 0.95vw);
 
-  /* ── Aliases used throughout CSS ── */
+  /* ── Semantic aliases ── */
   --bg-primary: var(--c3);
   --bg-secondary: var(--c4);
-  --bg-card: #1a1a1a;
+  --bg-card: #0F1A2A;
   --accent: var(--c2);
-  --accent-light: #ecdcc4;
-  --accent-dark: #b8a080;
+  --accent-light: #DCBF6E;
+  --accent-dark: #A08530;
+  --accent-glow: rgba(200, 167, 80, 0.35);
   --text-primary: var(--c1);
-  --text-secondary: #b8b0a4;
-  --text-muted: #787068;
-  --border: rgba(220, 203, 179, 0.18);
+  --text-secondary: #8A94A8;
+  --text-muted: #576278;
+  --border: rgba(200, 167, 80, 0.12);
   --white: #ffffff;
   --header-h: 80px;
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
@@ -44,7 +45,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 body {
@@ -319,8 +320,8 @@ button {
 }
 
 .header.scrolled {
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(7, 11, 18, 0.94);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -456,9 +457,9 @@ button {
   position: absolute;
   inset: 0;
   background: linear-gradient(to right,
-      rgba(10, 10, 10, 0.85) 0%,
-      rgba(10, 10, 10, 0.5) 60%,
-      rgba(10, 10, 10, 0.2) 100%);
+      rgba(7, 11, 18, 0.9) 0%,
+      rgba(7, 11, 18, 0.55) 55%,
+      rgba(7, 11, 18, 0.15) 100%);
 }
 
 .banner-main {
@@ -522,16 +523,7 @@ button {
   width: 48px;
 }
 
-/* ── ScrollSmoother wrapper ────────────────────────────── */
-#smooth-wrapper {
-  overflow: hidden;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  top: 0;
-  left: 0;
-}
-
+/* ── ScrollSmoother wrapper (styles applied dynamically by GSAP) ── */
 #smooth-content {
   overflow: visible;
   width: 100%;
@@ -974,11 +966,11 @@ button {
 /* ── SplitText / GSAP initial animation states ─────────── */
 .about-heading-primary,
 .info-heading-animate {
-  color: #787068;
+  color: #3A4258;
 }
 
 .about-heading-secondary {
-  color: #504840;
+  color: #2A3248;
 }
 
 .about-reveal-box,
@@ -1008,7 +1000,7 @@ button {
 }
 
 .slogan-text {
-  color: #504840;
+  color: #2A3248;
 }
 
 /* ── Responsive ─────────────────────────────────────────── */
@@ -1190,8 +1182,8 @@ button {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom,
-      rgba(10, 10, 10, 0.92) 0%,
-      rgba(10, 10, 10, 0.88) 100%);
+      rgba(7, 11, 18, 0.93) 0%,
+      rgba(7, 11, 18, 0.90) 100%);
 }
 
 .approach-heading {
@@ -1308,7 +1300,7 @@ button {
 .team-card-img-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 10, 10, 0.6) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(7, 11, 18, 0.7) 0%, transparent 50%);
 }
 
 .team-card-info {
@@ -1425,4 +1417,289 @@ button {
   .info-top {
     margin-top: -60px;
   }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ENHANCED GSAP ANIMATION STYLES
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Custom cursor (desktop only) ─────────────────────── */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: difference;
+  opacity: 0;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none !important;
+  }
+}
+
+/* ── Marquee ticker ───────────────────────────────────── */
+.marquee-section {
+  overflow: hidden;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  position: relative;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 0 40px;
+  white-space: nowrap;
+}
+
+.marquee-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(14px, 1.6vw, 22px);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  transition: color 0.3s;
+}
+
+.marquee-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ── Glow effects ─────────────────────────────────────── */
+.glow-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent) 30%,
+    var(--accent) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.accent-glow {
+  text-shadow: 0 0 30px var(--accent-glow), 0 0 60px rgba(200, 167, 80, 0.15);
+}
+
+/* ── Banner enhancements ──────────────────────────────── */
+.banner-char {
+  display: inline-block;
+}
+
+.banner-slide {
+  will-change: transform;
+}
+
+.banner-decorative-line {
+  position: absolute;
+  background: var(--accent);
+  opacity: 0.15;
+  z-index: 5;
+}
+
+.banner-line-v {
+  width: 1px;
+  height: 100%;
+  right: 20%;
+  top: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+.banner-line-h {
+  width: 100%;
+  height: 1px;
+  left: 0;
+  bottom: 25%;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ── 3D tilt cards ────────────────────────────────────── */
+.tilt-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.approach-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.4s;
+}
+
+.approach-card:hover {
+  border-color: var(--accent);
+  background: rgba(15, 26, 42, 0.95);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px var(--accent-glow);
+}
+
+.approach-card-num {
+  transition: opacity 0.4s, transform 0.4s;
+}
+
+.approach-card:hover .approach-card-num {
+  opacity: 0.5;
+  transform: scale(1.1);
+}
+
+/* ── Team card enhancements ───────────────────────────── */
+.team-card {
+  will-change: transform;
+  transition: border-color 0.3s, box-shadow 0.4s, transform 0.4s;
+}
+
+.team-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  transform: translateY(-6px);
+}
+
+.team-card-img-wrap {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* ── Stats enhancements ───────────────────────────────── */
+.stat-number {
+  position: relative;
+}
+
+.stat-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.6s var(--ease-out-expo);
+}
+
+.stat-item:hover::after {
+  width: 60%;
+}
+
+/* ── Contact form enhancements ────────────────────────── */
+.join-section .holder {
+  opacity: 1;
+}
+
+.contact-reveal {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.input-item input {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-item input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(200, 167, 80, 0.08);
+}
+
+/* ── Shimmer effect ───────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--accent-dark) 0%,
+    var(--accent-light) 25%,
+    var(--accent) 50%,
+    var(--accent-light) 75%,
+    var(--accent-dark) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ── Horizontal reveal line ───────────────────────────── */
+.h-reveal-line {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ── Floating particle dots ───────────────────────────── */
+.floating-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Enhanced button glow on hover ────────────────────── */
+.button {
+  transition: background 0.35s, color 0.35s, box-shadow 0.35s;
+}
+
+.button:hover {
+  color: var(--bg-primary);
+  box-shadow: 0 4px 30px var(--accent-glow);
+}
+
+/* ── Loader enhancements ──────────────────────────────── */
+.loader-logo-text {
+  position: relative;
+}
+
+.loader-progress-fill {
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-light));
+  transition: width 0.1s linear;
 }

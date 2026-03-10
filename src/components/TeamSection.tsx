@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const team = [
     {
@@ -34,33 +36,162 @@ const team = [
 
 export default function TeamSection() {
     const sectionRef = useRef<HTMLDivElement>(null);
+    const headingRef = useRef<HTMLDivElement>(null);
+    const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(
-                ".team-card",
-                { y: 60, opacity: 0 },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.9,
-                    ease: "power3.out",
-                    stagger: 0.15,
-                    scrollTrigger: {
-                        trigger: ".team-grid",
-                        start: "top 80%",
-                    },
+    useGSAP(() => {
+        document.fonts.ready.then(() => {
+            const ctx = gsap.context(() => {
+                // SplitText on heading
+                if (headingRef.current) {
+                    const split = SplitText.create(
+                        headingRef.current.querySelectorAll(".text-inner"),
+                        { type: "chars" }
+                    );
+                    gsap.fromTo(
+                        split.chars,
+                        { y: 50, opacity: 0 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            duration: 0.8,
+                            stagger: 0.02,
+                            ease: "power3.out",
+                            scrollTrigger: {
+                                trigger: headingRef.current,
+                                start: "top 80%",
+                            },
+                        }
+                    );
                 }
-            );
-        }, sectionRef);
 
-        return () => ctx.revert();
+                // Subheading clip-path
+                gsap.fromTo(
+                    ".team-header .subheading",
+                    { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" },
+                    {
+                        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+                        duration: 0.8,
+                        ease: "power3.inOut",
+                        scrollTrigger: {
+                            trigger: ".team-header .subheading",
+                            start: "top 80%",
+                        },
+                    }
+                );
+
+                // Cards with clipPath image reveal + alternating direction
+                cardRefs.current.forEach((card, i) => {
+                    if (!card) return;
+
+                    const imgWrap = card.querySelector(".team-card-img-wrap");
+                    const info = card.querySelector(".team-card-info");
+                    const isEven = i % 2 === 0;
+
+                    // Card entrance — alternating from left/right
+                    gsap.fromTo(
+                        card,
+                        {
+                            x: isEven ? -60 : 60,
+                            y: 40,
+                            opacity: 0,
+                            rotateZ: isEven ? -2 : 2,
+                        },
+                        {
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                            rotateZ: 0,
+                            duration: 1,
+                            delay: i * 0.12,
+                            ease: "power3.out",
+                            scrollTrigger: {
+                                trigger: ".team-grid",
+                                start: "top 80%",
+                            },
+                        }
+                    );
+
+                    // Image reveal — curtain wipe from bottom
+                    if (imgWrap) {
+                        gsap.fromTo(
+                            imgWrap,
+                            { clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+                            {
+                                clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
+                                duration: 1.1,
+                                delay: i * 0.12 + 0.2,
+                                ease: "power3.inOut",
+                                scrollTrigger: {
+                                    trigger: ".team-grid",
+                                    start: "top 80%",
+                                },
+                            }
+                        );
+                    }
+
+                    // Info text slides up
+                    if (info) {
+                        gsap.fromTo(
+                            info,
+                            { y: 20, opacity: 0 },
+                            {
+                                y: 0,
+                                opacity: 1,
+                                duration: 0.7,
+                                delay: i * 0.12 + 0.5,
+                                ease: "power2.out",
+                                scrollTrigger: {
+                                    trigger: ".team-grid",
+                                    start: "top 80%",
+                                },
+                            }
+                        );
+                    }
+                });
+
+                // CTA button entrance
+                gsap.fromTo(
+                    ".team-cta .button",
+                    { y: 30, opacity: 0, scale: 0.9 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.7,
+                        ease: "back.out(1.4)",
+                        scrollTrigger: {
+                            trigger: ".team-cta",
+                            start: "top 90%",
+                        },
+                    }
+                );
+
+                // Glow line above grid
+                gsap.fromTo(
+                    ".team-glow-line",
+                    { scaleX: 0, opacity: 0 },
+                    {
+                        scaleX: 1,
+                        opacity: 1,
+                        duration: 1.2,
+                        ease: "power2.inOut",
+                        scrollTrigger: {
+                            trigger: ".team-grid",
+                            start: "top 85%",
+                        },
+                    }
+                );
+            }, sectionRef);
+
+            return () => ctx.revert();
+        });
     }, []);
 
     return (
         <section className="team-section" id="team" ref={sectionRef}>
             <div className="holder">
-                <div className="team-header">
+                <div className="team-header" ref={headingRef}>
                     <div className="key-wrap">
                         <div className="key" />
                     </div>
@@ -75,9 +206,15 @@ export default function TeamSection() {
                     <div className="subheading">Institutional Expertise · Personal Commitment</div>
                 </div>
 
+                <div className="glow-line team-glow-line" style={{ marginBottom: 32 }} />
+
                 <div className="team-grid">
-                    {team.map((member) => (
-                        <div className="team-card" key={member.name}>
+                    {team.map((member, i) => (
+                        <div
+                            className="team-card"
+                            key={member.name}
+                            ref={(el) => { cardRefs.current[i] = el; }}
+                        >
                             <div className="team-card-img-wrap">
                                 <img
                                     src={member.img}

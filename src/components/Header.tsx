@@ -2,15 +2,20 @@
 import { useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 60);
-        window.addEventListener("scroll", onScroll);
-        return () => window.removeEventListener("scroll", onScroll);
+        const trigger = ScrollTrigger.create({
+            start: 60,
+            onUpdate: (self) => setScrolled(self.scroll() > 60),
+        });
+        return () => trigger.kill();
     }, []);
 
     // ── SpyltMilk Navbar-style magnetic hover effect ──
@@ -129,7 +134,7 @@ export default function Header() {
                         position: "fixed",
                         inset: 0,
                         top: "var(--header-h)",
-                        background: "rgba(10,10,10,0.97)",
+                        background: "rgba(7,11,18,0.97)",
                         zIndex: 99,
                         display: "flex",
                         flexDirection: "column",
