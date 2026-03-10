@@ -40,8 +40,9 @@ export default function TeamSection() {
     const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const ctx = gsap.context(() => {
+            ctx = gsap.context(() => {
                 // SplitText on heading
                 if (headingRef.current) {
                     const split = SplitText.create(
@@ -183,9 +184,10 @@ export default function TeamSection() {
                     }
                 );
             }, sectionRef);
-
-            return () => ctx.revert();
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     return (

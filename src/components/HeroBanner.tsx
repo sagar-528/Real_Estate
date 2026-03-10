@@ -59,83 +59,89 @@ export default function HeroBanner() {
 
     // Grand entrance timeline
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const tl = gsap.timeline({ delay: 0.2 });
+            ctx = gsap.context(() => {
+                const tl = gsap.timeline({ delay: 0.2 });
 
-            // Decorative lines
-            tl.to(".banner-line-v", {
-                scaleY: 1,
-                duration: 1.5,
-                ease: "power2.inOut",
-            }, 0);
-            tl.to(".banner-line-h", {
-                scaleX: 1,
-                duration: 1.8,
-                ease: "power2.inOut",
-            }, 0.3);
+                // Decorative lines
+                tl.to(".banner-line-v", {
+                    scaleY: 1,
+                    duration: 1.5,
+                    ease: "power2.inOut",
+                }, 0);
+                tl.to(".banner-line-h", {
+                    scaleX: 1,
+                    duration: 1.8,
+                    ease: "power2.inOut",
+                }, 0.3);
 
-            // Subheading clip-path reveal
-            tl.fromTo(
-                subRef.current,
-                { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)", opacity: 1 },
-                {
-                    clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-                    duration: 0.9,
-                    ease: "power3.inOut",
-                },
-                0.4
-            );
-
-            // SplitText character animation on h1
-            if (h1Ref.current) {
-                const split = SplitText.create(h1Ref.current, { type: "chars,words" });
+                // Subheading clip-path reveal
                 tl.fromTo(
-                    split.chars,
-                    { y: 80, opacity: 0, rotateX: -40 },
+                    subRef.current,
+                    { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)", opacity: 1 },
                     {
-                        y: 0,
-                        opacity: 1,
-                        rotateX: 0,
-                        duration: 1,
-                        stagger: 0.025,
-                        ease: "power3.out",
+                        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+                        duration: 0.9,
+                        ease: "power3.inOut",
                     },
-                    0.5
+                    0.4
                 );
-            }
 
-            // Button scales in with elastic bounce
-            tl.fromTo(
-                btnRef.current,
-                { y: 30, opacity: 0, scale: 0.9 },
-                { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.4)" },
-                1.2
-            );
+                // SplitText character animation on h1
+                if (h1Ref.current) {
+                    const split = SplitText.create(h1Ref.current, { type: "chars,words" });
+                    tl.fromTo(
+                        split.chars,
+                        { y: 80, opacity: 0, rotateX: -40 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            rotateX: 0,
+                            duration: 1,
+                            stagger: 0.025,
+                            ease: "power3.out",
+                        },
+                        0.5
+                    );
+                }
 
-            // Link flash slides in
-            tl.fromTo(
-                linkRef.current,
-                { x: -20, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-                1.4
-            );
-
-            // Dots animate in
-            if (dotsRef.current) {
+                // Button scales in with elastic bounce
                 tl.fromTo(
-                    dotsRef.current.children,
-                    { scaleX: 0, opacity: 0 },
-                    {
-                        scaleX: 1,
-                        opacity: 1,
-                        duration: 0.5,
-                        stagger: 0.1,
-                        ease: "power2.out",
-                    },
-                    1.5
+                    btnRef.current,
+                    { y: 30, opacity: 0, scale: 0.9 },
+                    { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.4)" },
+                    1.2
                 );
-            }
+
+                // Link flash slides in
+                tl.fromTo(
+                    linkRef.current,
+                    { x: -20, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+                    1.4
+                );
+
+                // Dots animate in
+                if (dotsRef.current) {
+                    tl.fromTo(
+                        dotsRef.current.children,
+                        { scaleX: 0, opacity: 0 },
+                        {
+                            scaleX: 1,
+                            opacity: 1,
+                            duration: 0.5,
+                            stagger: 0.1,
+                            ease: "power2.out",
+                        },
+                        1.5
+                    );
+                }
+            }, sectionRef);
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     return (

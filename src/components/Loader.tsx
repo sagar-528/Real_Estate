@@ -1,11 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
 export default function Loader({ onComplete }: { onComplete: () => void }) {
     const [progress, setProgress] = useState(0);
     const [canHide, setCanHide] = useState(false);
+    const onCompleteRef = useRef(onComplete);
+    const exitFiredRef = useRef(false);
+    onCompleteRef.current = onComplete;
 
     useEffect(() => {
         const MIN_DURATION = 1400;
@@ -114,12 +117,14 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
         );
     }, []);
 
-    // Exit animation
+    // Exit animation — uses ref to avoid dependency on onComplete identity
     useGSAP(() => {
-        if (progress >= 100 && canHide) {
-            const tl = gsap.timeline({ onComplete });
+        if (progress >= 100 && canHide && !exitFiredRef.current) {
+            exitFiredRef.current = true;
+            const tl = gsap.timeline({
+                onComplete: () => onCompleteRef.current(),
+            });
 
-            // Scale and fade the content
             tl.to(".loader-box", {
                 scale: 0.9,
                 opacity: 0,
@@ -127,7 +132,6 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
                 ease: "power2.in",
             });
 
-            // Split the background into two panels sliding apart
             tl.to(".loader-bg", {
                 yPercent: -100,
                 duration: 0.8,
@@ -139,7 +143,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
                 duration: 0.01,
             });
         }
-    }, [progress, canHide, onComplete]);
+    }, [progress, canHide]);
 
     return (
         <div className="loader">

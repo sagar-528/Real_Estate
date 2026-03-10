@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,6 +21,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
+    const handleLoaderComplete = useCallback(() => setLoading(false), []);
 
     useEffect(() => {
         if (loading) {
@@ -44,7 +45,7 @@ export default function Home() {
 
     return (
         <>
-            {loading && <Loader onComplete={() => setLoading(false)} />}
+            {loading && <Loader onComplete={handleLoaderComplete} />}
             <CustomCursor />
             <Header />
             <div id="smooth-wrapper" style={{ opacity: loading ? 0 : 1, transition: "opacity 0.5s" }}>

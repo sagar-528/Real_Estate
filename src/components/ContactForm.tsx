@@ -25,8 +25,9 @@ export default function ContactForm() {
     };
 
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const ctx = gsap.context(() => {
+            ctx = gsap.context(() => {
                 // Heading SplitText reveal
                 const headingSplit = SplitText.create(".join-heading-animate", { type: "words" });
                 gsap.fromTo(
@@ -111,9 +112,10 @@ export default function ContactForm() {
                     }
                 );
             }, sectionRef);
-
-            return () => ctx.revert();
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     return (

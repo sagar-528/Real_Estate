@@ -16,8 +16,9 @@ export default function InfoSection() {
     const investImgRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const ctx = gsap.context(() => {
+            ctx = gsap.context(() => {
                 // Parallax on the info background image
                 gsap.to(bgImgRef.current, {
                     yPercent: 15,
@@ -191,9 +192,10 @@ export default function InfoSection() {
                     }
                 );
             }, sectionRef);
-
-            return () => ctx.revert();
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     return (

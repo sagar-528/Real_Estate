@@ -12,8 +12,9 @@ export default function AboutSection() {
     const imgRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const ctx = gsap.context(() => {
+            ctx = gsap.context(() => {
                 // SplitText on the heading — scrub color reveal word by word
                 const headingSplit = SplitText.create(".about-heading-primary", { type: "words" });
                 gsap.to(headingSplit.words, {
@@ -82,9 +83,10 @@ export default function AboutSection() {
                     },
                 });
             }, sectionRef);
-
-            return () => ctx.revert();
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     return (

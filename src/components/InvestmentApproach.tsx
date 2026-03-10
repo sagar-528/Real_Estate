@@ -55,8 +55,9 @@ export default function InvestmentApproach() {
     }, []);
 
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const ctx = gsap.context(() => {
+            ctx = gsap.context(() => {
                 // Heading entrance with SplitText
                 if (headingRef.current) {
                     const headingSplit = SplitText.create(
@@ -161,9 +162,10 @@ export default function InvestmentApproach() {
                     }
                 );
             }, sectionRef);
-
-            return () => ctx.revert();
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     // 3D tilt on hover

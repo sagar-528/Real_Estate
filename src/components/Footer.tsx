@@ -20,8 +20,9 @@ export default function Footer() {
     const footerRef = useRef<HTMLElement>(null);
 
     useGSAP(() => {
+        let ctx: gsap.Context;
         document.fonts.ready.then(() => {
-            const ctx = gsap.context(() => {
+            ctx = gsap.context(() => {
                 // Logo SplitText chars flying up on scroll scrub
                 const footTextSplit = SplitText.create(".footer-logo-animate", { type: "chars" });
                 gsap.from(footTextSplit.chars, {
@@ -102,9 +103,10 @@ export default function Footer() {
                     }
                 );
             }, footerRef);
-
-            return () => ctx.revert();
         });
+        return () => {
+            ctx?.revert();
+        };
     }, []);
 
     return (
